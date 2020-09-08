@@ -1,0 +1,57 @@
+stages:
+  - test
+  - build
+  - deploy
+variables:
+  DOCKER_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+test:
+  stage: test
+  image: python:3.8.4-alpine3.12
+  cache: {}
+  services:
+    - name: postgres:latest
+      alias: db
+  variables:
+    POSTGRES_DB: quotes
+    POSTGRES_USER: ${DBUSER}
+    POSTGRES_PASSWORD: ${DBPASS}
+    POSTGRES_HOST: db
+    FLASK_ENV: 'development'
+  script:
+    - apk add gcc libc-dev linux-headers postgresql-dev
+    - pip install -r requirements.txt
+    - pytest
+
+
+build:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY    
+    - docker info 
+  script:
+    - docker build -t $DOCKER_IMAGE_TAG .
+    - docker push $DOCKER_IMAGE_TAG
+
+deploy:
+  stage: deploy
+  image: docker:stable
+  services:
+   - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  when: manual
+  only:
+    - master
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $DOCKER_IMAGE_TAG
+    - docker tag  $DOCKER_IMAGE_TAG $CI_REGISTRY_IMAGE:app_latest
+    - docker push $CI_REGISTRY_IMAGE:app_latest
