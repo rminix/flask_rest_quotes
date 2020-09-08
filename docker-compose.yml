@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+
+  db:
+    container_name: db
+    image: postgres
+    env_file:
+      - .env
+    volumes:
+       - db-data:/var/lib/postgresql/data
+    restart: always
+
+  web:
+    container_name: web
+    image: rest_quote:latest
+    depends_on:
+      - db
+    ports:
+      - '8080'
+    env_file:
+      - .env
+    restart: always
+
+  nginx:
+    container_name: nginx
+    image: customnginx
+    depends_on:
+      - db 
+      - web
+    ports:
+      - '80:80'
+    
+
+volumes:
+  db-data:
+    
+    
