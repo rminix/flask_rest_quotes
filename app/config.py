@@ -1,4 +1,5 @@
 import os
+from app.utils.exporter import exporter
 
 if os.getenv('FLASK_ENV') == 'production':
     exporter()
