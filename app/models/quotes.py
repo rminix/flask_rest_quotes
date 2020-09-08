@@ -15,3 +15,13 @@ class QuotesModel(db.Model):
     def create(self):
         db.session.add(self)
         db.session.commit()
+
+    @staticmethod
+    def num_of_rows():
+        return db.session.query(QuotesModel).count()
+
+    @classmethod
+    def find_by_id(cls, num):
+        return db.session.query(QuotesModel).get_or_404(num)
+
+    
