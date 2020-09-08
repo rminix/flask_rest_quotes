@@ -1,0 +1,37 @@
+### Code ###
+.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Environments
+.env
+.venv
+
+# Pytest 
+.pytest_cache
+tests
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+### Flask.Python Stack ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+
+#git
+.git
+.cache
+
+docker-compose.yml
+docker-compose-prod.yml
+.gitlab-ci.yml
+tests/*
+nginx
